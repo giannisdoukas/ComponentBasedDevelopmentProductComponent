@@ -1,33 +1,39 @@
 package com.doukas.ioannis.ProductComponent;
 
-import com.doukas.ioannis.ProductComponent.Product;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.HttpServerErrorException;
 
 import java.util.List;
 
 @RestController
 public class ProductController {
+
+    public ProductController(){}
+
     @GetMapping("/")
-    List<Product> all(){
+    List<ProductBean> all(){
         throw new UnsupportedOperationException("Not yet");
     }
 
     @PostMapping("/")
-    Product newProduct(@RequestBody Product newProduct){
+    ProductBean newProduct(@RequestBody ProductBean newProduct){
         throw new UnsupportedOperationException("Not yet");
     }
 
     @GetMapping("/{id}")
-    Product getProduct(@PathVariable Long id){
+    ProductBean getProduct(@PathVariable Long id){
         throw new UnsupportedOperationException("Not yet");
     }
 
     @PutMapping("/{id}")
-    Product replaceProduct(@RequestBody Product newProduct, @PathVariable Long id){
+    ProductBean replaceProduct(@RequestBody ProductBean newProduct, @PathVariable Long id){
         throw new UnsupportedOperationException("Not yet");
     }
 
+    /**
+     *
+     * @param id
+     * @return Number of deleted products. That should be 0 or 1
+     */
     @DeleteMapping("/{id}")
     int deleteProduct(@PathVariable Long id){
         throw new UnsupportedOperationException("Not yet");
