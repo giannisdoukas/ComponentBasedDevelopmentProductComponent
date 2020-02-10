@@ -1,4 +1,5 @@
 package com.doukas.ioannis.ProductComponent;
 
-public class Product {
+public class ProductBean {
+    public Long id;
 }
