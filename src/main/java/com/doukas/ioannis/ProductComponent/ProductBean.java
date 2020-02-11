@@ -12,13 +12,13 @@ public class ProductBean {
     private final String description;
     private final Float price;
 
-    public ProductBean(String id, String description, Float price){
+    public ProductBean(String id, String description, Float price) {
         this.id = id;
         this.description = description;
         this.price = price;
     }
 
-    public float getPrice() {
+    public Float getPrice() {
         return price;
     }
 
@@ -28,5 +28,16 @@ public class ProductBean {
 
     public String getId() {
         return id;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof ProductBean) {
+            ProductBean p2 = (ProductBean) obj;
+            return id.equals(p2.id) && price.equals(p2.price) && description.equals(p2.description);
+        } else {
+            return false;
+        }
+
     }
 }

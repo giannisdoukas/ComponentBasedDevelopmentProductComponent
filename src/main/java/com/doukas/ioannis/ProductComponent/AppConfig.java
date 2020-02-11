@@ -112,9 +112,4 @@ public class AppConfig extends AbstractCassandraConfiguration {
         return SchemaAction.CREATE_IF_NOT_EXISTS;
     }
 
-    //    @Bean
-//    public ProductController productController(){
-//        return new ProductController();
-//    }
-
 }
