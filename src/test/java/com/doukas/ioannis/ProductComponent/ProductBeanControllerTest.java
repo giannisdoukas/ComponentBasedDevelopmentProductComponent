@@ -25,6 +25,7 @@ import java.util.UUID;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
@@ -176,8 +177,29 @@ class ProductBeanControllerTest {
 
     @Test
     void deleteProduct() throws Exception {
-        mockMvc.perform(
-                delete("/1")
-        ).andExpect(status().isOk());
+        String id = UUID.randomUUID().toString();
+        String description = "new description ...";
+        float price = 12.5f;
+        ProductBean product = new ProductBean(id, description, price);
+        productRepository.save(product);
+
+        int[] expectedFound = {1};
+        int[] expectedNotFound = {0};
+        Assert.assertThat(
+                productServiceMock.deleteProduct(id),
+                is(expectedFound)
+        );
+
+        Assert.assertThat(
+                productServiceMock.deleteProduct("404"),
+                is(expectedNotFound)
+        );
+
+        productRepository.save(product);
+        mockMvc.perform(delete("/" + id))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(TestUtil.APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$").value(is(expectedFound), int[].class))
+        ;
     }
 }

@@ -14,7 +14,8 @@ public class ProductController {
     @Autowired
     ProductRepository repository;
 
-    public ProductController(){}
+    public ProductController() {
+    }
 
     @GetMapping("/")
     Iterable<ProductBean> all() {
@@ -22,29 +23,37 @@ public class ProductController {
     }
 
     @PostMapping("/")
-    ProductBean newProduct(@RequestBody ProductBean newProduct){
+    ProductBean newProduct(@RequestBody ProductBean newProduct) {
         return repository.save(newProduct);
+
     }
 
     @GetMapping("/{id}")
     @Nullable
-    Optional<ProductBean> getProduct(@PathVariable String id){
+    Optional<ProductBean> getProduct(@PathVariable String id) {
         return repository.findById(id);
     }
 
     @PutMapping("/{id}")
-    ProductBean replaceProduct(@RequestBody ProductBean newProduct, @PathVariable Long id){
+    ProductBean replaceProduct(@RequestBody ProductBean newProduct, @PathVariable Long id) {
         throw new UnsupportedOperationException("Not yet");
     }
 
     /**
-     *
      * @param id
      * @return Number of deleted products. That should be 0 or 1
      */
     @DeleteMapping("/{id}")
-    int deleteProduct(@PathVariable Long id){
-        throw new UnsupportedOperationException("Not yet");
+    int[] deleteProduct(@PathVariable String id) {
+        Optional<ProductBean> byId = repository.findById(id);
+        int[] result = {1};
+        if (byId.isPresent()) {
+            repository.delete(byId.get());
+        } else {
+            result[0] = 0;
+        }
+        return result;
+
     }
 
 }
