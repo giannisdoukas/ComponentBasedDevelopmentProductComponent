@@ -22,7 +22,7 @@ public class ProductController {
 
     @PostMapping("/")
     ProductBean newProduct(@RequestBody ProductBean newProduct){
-        throw new UnsupportedOperationException("Not yet");
+        return repository.save(newProduct);
     }
 
     @GetMapping("/{id}")

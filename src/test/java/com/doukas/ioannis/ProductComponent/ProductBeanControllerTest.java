@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import org.hamcrest.collection.IsIterableContainingInAnyOrder;
 import org.junit.Assert;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -21,8 +22,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -42,6 +42,12 @@ class ProductBeanControllerTest {
     @BeforeEach
     void setup() {
         mockMvc = MockMvcBuilders.standaloneSetup(productServiceMock).build();
+        productRepository.deleteAll();
+    }
+
+    @AfterEach
+    void tearDown() {
+        productRepository.deleteAll();
     }
 
     @Test
@@ -86,20 +92,47 @@ class ProductBeanControllerTest {
     @Test
     void newProduct() throws Exception {
         String id = UUID.randomUUID().toString();
-        String description = "description ...";
-        float price = 10f;
+        String description = "new description ...";
+        float price = 12.5f;
         ProductBean product = new ProductBean(id, description, price);
         ObjectMapper mapper = new ObjectMapper();
         mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
         ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
         String requestJson = ow.writeValueAsString(product);
 
-        mockMvc.perform(
-                post("/")
-                        .contentType(MediaType.APPLICATION_JSON_UTF8)
-                        .content(requestJson)
-        )
-                .andExpect(status().isOk());
+        Assert.assertThat(
+                product,
+                is(productServiceMock.newProduct(product))
+        );
+
+        List<ProductBean> result = new ArrayList<ProductBean>();
+        productServiceMock.all().forEach(result::add);
+
+        Assert.assertThat(
+                result,
+                IsIterableContainingInAnyOrder.containsInAnyOrder(product)
+        );
+        Assert.assertEquals(result.size(), 1);
+
+        productRepository.deleteAll();
+
+        mockMvc.perform(post("/")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestJson))
+                .andExpect(status().isOk())
+        .andExpect(jsonPath("$.id").value(is(id)))
+        .andExpect(jsonPath("$.description").value(is(description)))
+        .andExpect(jsonPath("$.price").value(is(price), Float.class))
+        ;
+
+        result.clear();
+        productServiceMock.all().forEach(result::add);
+
+        Assert.assertThat(
+                result,
+                IsIterableContainingInAnyOrder.containsInAnyOrder(product)
+        );
+        Assert.assertEquals(result.size(), 1);
     }
 
     @Test

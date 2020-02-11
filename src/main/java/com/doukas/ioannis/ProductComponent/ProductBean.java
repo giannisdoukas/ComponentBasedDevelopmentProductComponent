@@ -2,15 +2,24 @@ package com.doukas.ioannis.ProductComponent;
 
 import org.springframework.data.cassandra.core.mapping.PrimaryKey;
 import org.springframework.data.cassandra.core.mapping.Table;
+import org.springframework.lang.Nullable;
+
+import java.util.UUID;
 
 //@Table(caseSensitiveKeyspace = false,
 //        caseSensitiveTable = false)
 @Table("productbean")
 public class ProductBean {
     @PrimaryKey
-    private final String id;
-    private final String description;
-    private final Float price;
+    private String id;
+    private String description;
+    private Float price;
+
+    public ProductBean(){
+        id = null;
+        description = null;
+        price = null;
+    }
 
     public ProductBean(String id, String description, Float price) {
         this.id = id;
@@ -29,6 +38,7 @@ public class ProductBean {
     public String getId() {
         return id;
     }
+
 
     @Override
     public boolean equals(Object obj) {
