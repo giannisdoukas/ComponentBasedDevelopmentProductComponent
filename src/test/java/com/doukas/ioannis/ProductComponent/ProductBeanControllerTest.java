@@ -160,19 +160,74 @@ class ProductBeanControllerTest {
     @Test
     void replaceProduct() throws Exception {
         String id = UUID.randomUUID().toString();
-        String description = "description ...";
-        float price = 10f;
+        String newId = UUID.randomUUID().toString();
+        String description = "new description ...";
+        String newDescription = "this is the new description";
+        float price = 12.5f;
         ProductBean product = new ProductBean(id, description, price);
+
+        ProductBean newProduct = new ProductBean(id, newDescription, price);
+        ProductBean newProductNewID = new ProductBean(newId, newDescription, price);
         ObjectMapper mapper = new ObjectMapper();
         mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
         ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
-        String requestJson = ow.writeValueAsString(product);
+        String requestJson = ow.writeValueAsString(newProduct);
 
-        mockMvc.perform(
-                put("/" + id)
-                        .contentType(MediaType.APPLICATION_JSON_UTF8)
-                        .content(requestJson)
-        ).andExpect(status().isOk());
+        // new Product same ID
+        productRepository.save(product);
+        Assert.assertThat(
+                newProduct,
+                is(productServiceMock.replaceProduct(newProduct, id))
+        );
+
+        List<ProductBean> result = new ArrayList<ProductBean>();
+        productServiceMock.all().forEach(result::add);
+
+        Assert.assertThat(
+                result,
+                IsIterableContainingInAnyOrder.containsInAnyOrder(newProduct)
+        );
+        Assert.assertEquals(result.size(), 1);
+
+        productRepository.deleteAll();
+
+        // replace and the ID
+        productRepository.save(product);
+        Assert.assertThat(
+                newProductNewID,
+                is(productServiceMock.replaceProduct(newProductNewID, id))
+        );
+
+        result.clear();
+        productServiceMock.all().forEach(result::add);
+
+        Assert.assertThat(
+                result,
+                IsIterableContainingInAnyOrder.containsInAnyOrder(newProductNewID)
+        );
+        Assert.assertEquals(result.size(), 1);
+
+        productRepository.deleteAll();
+
+        // test the rest call
+        productRepository.save(product);
+        mockMvc.perform(put("/" + id)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestJson))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(is(id)))
+                .andExpect(jsonPath("$.description").value(is(newDescription)))
+                .andExpect(jsonPath("$.price").value(is(price), Float.class))
+        ;
+
+        result.clear();
+        productServiceMock.all().forEach(result::add);
+
+        Assert.assertThat(
+                result,
+                IsIterableContainingInAnyOrder.containsInAnyOrder(newProduct)
+        );
+        Assert.assertEquals(result.size(), 1);
     }
 
     @Test

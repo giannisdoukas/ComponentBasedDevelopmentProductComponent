@@ -3,6 +3,7 @@ package com.doukas.ioannis.ProductComponent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
@@ -34,9 +35,13 @@ public class ProductController {
         return repository.findById(id);
     }
 
+    @Transactional
     @PutMapping("/{id}")
-    ProductBean replaceProduct(@RequestBody ProductBean newProduct, @PathVariable Long id) {
-        throw new UnsupportedOperationException("Not yet");
+    ProductBean replaceProduct(@RequestBody ProductBean newProduct, @PathVariable String id) {
+        if (!newProduct.getId().equals(id)) {
+            repository.deleteById(id);
+        }
+        return repository.save(newProduct);
     }
 
     /**
