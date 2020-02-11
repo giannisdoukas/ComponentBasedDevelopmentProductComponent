@@ -120,9 +120,9 @@ class ProductBeanControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestJson))
                 .andExpect(status().isOk())
-        .andExpect(jsonPath("$.id").value(is(id)))
-        .andExpect(jsonPath("$.description").value(is(description)))
-        .andExpect(jsonPath("$.price").value(is(price), Float.class))
+                .andExpect(jsonPath("$.id").value(is(id)))
+                .andExpect(jsonPath("$.description").value(is(description)))
+                .andExpect(jsonPath("$.price").value(is(price), Float.class))
         ;
 
         result.clear();
@@ -137,9 +137,23 @@ class ProductBeanControllerTest {
 
     @Test
     void getProduct() throws Exception {
-        mockMvc.perform(
-                get("/1")
-        ).andExpect(status().isOk());
+        ProductBean productBean = new ProductBean(
+                UUID.randomUUID().toString(),
+                "description 1", 10.5f
+        );
+        productRepository.deleteAll();
+        productRepository.save(productBean);
+
+        Assert.assertThat(
+                productServiceMock.getProduct(productBean.getId()).get(),
+                is(productBean)
+        );
+
+        mockMvc.perform(get("/" + productBean.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(is(productBean.getId())))
+                .andExpect(jsonPath("$.description").value(is(productBean.getDescription())))
+                .andExpect(jsonPath("$.price").value(is(productBean.getPrice()), Float.class));
     }
 
     @Test

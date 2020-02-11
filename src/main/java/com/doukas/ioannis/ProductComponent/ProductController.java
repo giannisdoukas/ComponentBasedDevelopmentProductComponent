@@ -1,10 +1,11 @@
 package com.doukas.ioannis.ProductComponent;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.Optional;
 
 @Component
 @RestController
@@ -26,8 +27,9 @@ public class ProductController {
     }
 
     @GetMapping("/{id}")
-    ProductBean getProduct(@PathVariable Long id){
-        throw new UnsupportedOperationException("Not yet");
+    @Nullable
+    Optional<ProductBean> getProduct(@PathVariable String id){
+        return repository.findById(id);
     }
 
     @PutMapping("/{id}")
