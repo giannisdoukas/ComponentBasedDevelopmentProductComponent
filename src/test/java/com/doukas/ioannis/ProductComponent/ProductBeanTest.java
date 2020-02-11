@@ -2,6 +2,8 @@ package com.doukas.ioannis.ProductComponent;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.UUID;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class ProductBeanTest {
@@ -9,9 +11,9 @@ class ProductBeanTest {
     @Test
     void getPrice() {
         float expectedPrice = 10.5f;
-        ProductBean.ProductBeanBuilder builder = new ProductBean.ProductBeanBuilder();
-        builder.setPrice(expectedPrice);
-        ProductBean product = builder.build();
+        String id = UUID.randomUUID().toString();
+        String description = "description ...";
+        ProductBean product = new ProductBean(id, description, expectedPrice);
 
         assertEquals(product.getPrice(), expectedPrice);
     }
@@ -19,19 +21,19 @@ class ProductBeanTest {
     @Test
     void getDescription() {
         String expectedDescription = "This is the expected";
-        ProductBean.ProductBeanBuilder builder = new ProductBean.ProductBeanBuilder();
-        builder.setDescription(expectedDescription);
-        ProductBean product = builder.build();
+        float price = 10f;
+        String id = UUID.randomUUID().toString();
+        ProductBean product = new ProductBean(id, expectedDescription, price);
 
         assertEquals(product.getDescription(), expectedDescription);
     }
 
     @Test
     void getId() {
-        Long expectedId = 1L;
-        ProductBean.ProductBeanBuilder builder = new ProductBean.ProductBeanBuilder();
-        builder.setId(expectedId);
-        ProductBean product = builder.build();
+        String description = "description ...";
+        float price = 10f;
+        String expectedId = UUID.randomUUID().toString();
+        ProductBean product = new ProductBean(expectedId, description, price);
 
         assertEquals(product.getId(), expectedId);
     }

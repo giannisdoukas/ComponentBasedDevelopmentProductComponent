@@ -15,11 +15,13 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.util.UUID;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {TestContext.class, TestConfig.class})
+@ContextConfiguration(classes = {TestContext.class, AppConfig.class})
 @WebAppConfiguration
 class ProductBeanControllerTest {
 
@@ -42,7 +44,10 @@ class ProductBeanControllerTest {
 
     @Test
     void newProduct() throws Exception {
-        ProductBean product = new ProductBean();
+        String id = UUID.randomUUID().toString();
+        String description = "description ...";
+        float price = 10f;
+        ProductBean product = new ProductBean(id, description, price);
         ObjectMapper mapper = new ObjectMapper();
         mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
         ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
@@ -65,14 +70,17 @@ class ProductBeanControllerTest {
 
     @Test
     void replaceProduct() throws Exception {
-        ProductBean product = new ProductBean();
+        String id = UUID.randomUUID().toString();
+        String description = "description ...";
+        float price = 10f;
+        ProductBean product = new ProductBean(id, description, price);
         ObjectMapper mapper = new ObjectMapper();
         mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
         ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
         String requestJson = ow.writeValueAsString(product);
 
         mockMvc.perform(
-                put("/1")
+                put("/" + id)
                         .contentType(MediaType.APPLICATION_JSON_UTF8)
                         .content(requestJson)
         ).andExpect(status().isOk());

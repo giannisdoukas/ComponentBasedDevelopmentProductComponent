@@ -1,9 +1,20 @@
 package com.doukas.ioannis.ProductComponent;
 
+import org.springframework.data.cassandra.core.mapping.PrimaryKey;
+import org.springframework.data.cassandra.core.mapping.Table;
+
+@Table
 public class ProductBean {
-    private Long id;
-    private String description;
-    private float price;
+    @PrimaryKey
+    private final String id;
+    private final String description;
+    private final Float price;
+
+    public ProductBean(String id, String description, Float price){
+        this.id = id;
+        this.description = description;
+        this.price = price;
+    }
 
     public float getPrice() {
         return price;
@@ -13,30 +24,7 @@ public class ProductBean {
         return description;
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
-    }
-
-    public static class ProductBeanBuilder{
-        ProductBean productBean;
-        public ProductBeanBuilder(){
-            productBean = new ProductBean();
-        }
-
-        public void setPrice(float price){
-            productBean.price = price;
-        }
-
-        public void setDescription(String description){
-            productBean.description = description;
-        }
-
-        public void setId(Long id){
-            productBean.id = id;
-        }
-
-        public ProductBean build(){
-            return productBean;
-        }
     }
 }
