@@ -3,7 +3,9 @@ package com.doukas.ioannis.ProductComponent;
 import org.springframework.data.cassandra.core.mapping.PrimaryKey;
 import org.springframework.data.cassandra.core.mapping.Table;
 
-@Table
+//@Table(caseSensitiveKeyspace = false,
+//        caseSensitiveTable = false)
+@Table("productbean")
 public class ProductBean {
     @PrimaryKey
     private final String id;

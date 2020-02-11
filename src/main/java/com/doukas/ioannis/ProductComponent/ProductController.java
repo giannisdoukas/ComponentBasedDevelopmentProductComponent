@@ -1,17 +1,19 @@
 package com.doukas.ioannis.ProductComponent;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 public class ProductController {
-
+    @Autowired ProductRepository repository;
     public ProductController(){}
 
     @GetMapping("/")
-    List<ProductBean> all(){
-        throw new UnsupportedOperationException("Not yet");
+    Iterable<ProductBean> all() {
+//        throw new UnsupportedOperationException("Not yet");
+        return repository.findAll();
     }
 
     @PostMapping("/")

@@ -1,5 +1,6 @@
 package com.doukas.ioannis.ProductComponent;
 
+import com.oracle.tools.packager.Log;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -17,10 +18,10 @@ import org.springframework.data.cassandra.repository.config.EnableCassandraRepos
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Configuration
-@ComponentScan("com.doukas.ioannis.ProductComponent")
-@EnableCassandraRepositories(basePackages = {"com.doukas.ioannis.ProductComponent"})
+@EnableCassandraRepositories(basePackages = "com.doukas.ioannis.ProductComponent")
 public class AppConfig extends AbstractCassandraConfiguration {
     private String keyspace = "mykeyspace";
 
@@ -33,7 +34,6 @@ public class AppConfig extends AbstractCassandraConfiguration {
         cluster.setPort(32779);
         cluster.setUsername("cassandra");
         cluster.setJmxReportingEnabled(false);
-
         return cluster;
     }
 
@@ -57,30 +57,36 @@ public class AppConfig extends AbstractCassandraConfiguration {
         return res;
     }
 
-    @Bean
-    public CassandraMappingContext mappingContext() {
 
-        BasicCassandraMappingContext mappingContext =  new BasicCassandraMappingContext();
-        mappingContext.setUserTypeResolver(new SimpleUserTypeResolver(cluster().getObject(), "mykeyspace"));
+    @Bean
+    public CassandraMappingContext mappingContext() throws Exception{
+
+        CassandraMappingContext mappingContext = new CassandraMappingContext();
+        mappingContext.setInitialEntitySet(getInitialEntitySet());
 
         return mappingContext;
     }
 
     @Bean
-    public CassandraConverter converter() {
+    public CassandraConverter converter() throws Exception {
         return new MappingCassandraConverter(mappingContext());
     }
 
     /*
      * Factory bean that creates the com.datastax.driver.core.Session instance
      */
+    @Override
     @Bean
     public CassandraSessionFactoryBean session() {
 
         CassandraSessionFactoryBean session = new CassandraSessionFactoryBean();
         session.setCluster(cluster().getObject());
         session.setKeyspaceName(keyspace);
-        session.setConverter(converter());
+        try{
+            session.setConverter(converter());
+        } catch (Exception e){
+            Log.info(e.toString());
+        }
         session.setSchemaAction(SchemaAction.CREATE_IF_NOT_EXISTS);
 
         return session;
@@ -91,7 +97,22 @@ public class AppConfig extends AbstractCassandraConfiguration {
         return "mykeyspace";
     }
 
-//    @Bean
+    @Override
+    protected Set<Class<?>> getInitialEntitySet() throws ClassNotFoundException {
+        return CassandraEntityClassScanner.scan(getEntityBasePackages());
+    }
+
+//    @Override
+//    public String[] getEntityBasePackages() {
+//        return new String[] { "com.doukas.ioannis.ProductComponent" };
+//    }
+
+    @Override
+    public SchemaAction getSchemaAction() {
+        return SchemaAction.CREATE_IF_NOT_EXISTS;
+    }
+
+    //    @Bean
 //    public ProductController productController(){
 //        return new ProductController();
 //    }
