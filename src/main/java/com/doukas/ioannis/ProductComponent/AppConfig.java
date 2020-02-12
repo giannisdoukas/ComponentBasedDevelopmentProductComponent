@@ -1,10 +1,12 @@
 package com.doukas.ioannis.ProductComponent;
 
 import com.oracle.tools.packager.Log;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.data.cassandra.config.*;
 import org.springframework.data.cassandra.core.convert.CassandraConverter;
 import org.springframework.data.cassandra.core.convert.MappingCassandraConverter;
@@ -23,16 +25,21 @@ import java.util.Set;
 @Configuration
 @EnableCassandraRepositories(basePackages = "com.doukas.ioannis.ProductComponent")
 public class AppConfig extends AbstractCassandraConfiguration {
-    private String keyspace = "mykeyspace";
+    @Value("${cassandra_keyspace:mykeyspace}")
+    private String keyspace;
+
+    @Autowired
+    private Environment env;
 
     @Bean
     public CassandraCqlClusterFactoryBean cluster() {
 
         CassandraCqlClusterFactoryBean cluster = new CassandraCqlClusterFactoryBean();
         cluster.setKeyspaceCreations(getKeyspaceCreations());
-        cluster.setContactPoints("0.0.0.0");
-        cluster.setPort(32779);
-        cluster.setUsername("cassandra");
+        cluster.setContactPoints(env.getProperty("cassandra_host", "0.0.0.0"));
+        cluster.setPort(Integer.parseInt(env.getProperty("cassandra_port", "9042")));
+        cluster.setUsername(env.getProperty("cassandra_username", "cassandra"));
+        cluster.setPassword(env.getProperty("cassandra_password", ""));
         cluster.setJmxReportingEnabled(false);
         return cluster;
     }
@@ -94,7 +101,7 @@ public class AppConfig extends AbstractCassandraConfiguration {
 
     @Override
     protected String getKeyspaceName() {
-        return "mykeyspace";
+        return keyspace;
     }
 
     @Override

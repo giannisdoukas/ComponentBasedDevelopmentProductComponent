@@ -1,0 +1,22 @@
+version: "3.7"
+services:
+  product:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: dks-cbd/product
+    restart: on-failure
+    env_file:
+      - .env
+    ports:
+      - "0.0.0.0:8080:8080"
+    depends_on:
+      - cassandraservice
+
+  cassandraservice:
+    image: cassandra:latest
+    init: true
+    expose:
+      - "9042"
+    ports:
+      - "0.0.0.0:9042:9042"
