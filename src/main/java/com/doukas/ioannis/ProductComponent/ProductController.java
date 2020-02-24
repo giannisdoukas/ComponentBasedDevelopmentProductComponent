@@ -1,10 +1,12 @@
 package com.doukas.ioannis.ProductComponent;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
 
@@ -32,7 +34,13 @@ public class ProductController {
     @GetMapping("/{id}")
     @Nullable
     Optional<ProductBean> getProduct(@PathVariable String id) {
-        return repository.findById(id);
+        Optional<ProductBean> product = repository.findById(id);
+        if (!product.isPresent()){
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "product not found"
+            );
+        }
+        return product;
     }
 
     @Transactional
