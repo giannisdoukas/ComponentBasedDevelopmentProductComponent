@@ -1,0 +1,110 @@
+openapi: 3.0.1
+info:
+  title: Product Component
+  description: 'That component contains the basic functionality with the products'
+  contact:
+    email: ioannis.doukas@postgrad.manchester.ac.uk
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+servers:
+- url: product
+tags:
+- name: product
+  description: Everything about products
+paths:
+  /:
+    get:
+      tags:
+      - product
+      summary: get all proucts
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Product"
+    post:
+      tags:
+      - product
+      summary: Add a product
+      requestBody:
+        description: A product serialized in json
+        content:
+          application/json:
+            schema:
+               $ref: "#/components/schemas/Product"
+        required: true
+      responses:
+        405:
+          description: Invalid input
+          content: {}
+        415:
+          description: Unsupported Media Type
+          content: {}
+  /{id}:
+    get:
+      tags:
+      - product
+      summary: gets a product by id
+      parameters:
+      - name: id
+        in: path
+        description: the product id
+        required: true
+        schema:
+          type: string
+          format: uuid4
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        404:
+          description: product not found
+          content: {}
+    put:
+      tags:
+      - product
+      summary: updates a product
+      parameters:
+      - name: id
+        in: path
+        description: ID of product
+        required: true
+        schema:
+          type: string
+          format: uuid4
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        404:
+          description: product not found
+          content: {}
+  
+components:
+  schemas:
+    Product:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid4
+          example: dd3bb001-8105-48d3-8574-31145c94f606
+        description:
+          type: string
+          example: "This is a product description"
+        price:
+          type: number
+          format: float
+          example: 10
